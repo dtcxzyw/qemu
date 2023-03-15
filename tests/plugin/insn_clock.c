@@ -21,15 +21,9 @@ uint64_t* get_inline_insn_count(void);
 
 static void vcpu_tb_trans(qemu_plugin_id_t id, struct qemu_plugin_tb *tb)
 {
-    size_t n = qemu_plugin_tb_n_insns(tb);
-    size_t i;
-
-    for (i = 0; i < n; i++) {
-        struct qemu_plugin_insn *insn = qemu_plugin_tb_get_insn(tb, i);
-
-        qemu_plugin_register_vcpu_insn_exec_inline(
-            insn, QEMU_PLUGIN_INLINE_ADD_U64, get_inline_insn_count(), 1);
-    }
+  size_t n_insns = qemu_plugin_tb_n_insns(tb);
+  qemu_plugin_register_vcpu_tb_exec_inline(tb, QEMU_PLUGIN_INLINE_ADD_U64,
+                                           get_inline_insn_count(), n_insns);
 }
 
 static void plugin_exit(qemu_plugin_id_t id, void *p)
