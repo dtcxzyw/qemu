@@ -16,6 +16,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program; if not, see <http://www.gnu.org/licenses/>.
  */
+
 #define _ATFILE_SOURCE
 #include "qemu/osdep.h"
 #include "qemu/cutils.h"
@@ -1214,6 +1215,21 @@ static inline abi_long target_to_host_timespec64(struct timespec *host_ts,
     return 0;
 }
 #endif
+
+static uint64_t inline_insn_count;
+uint64_t* get_inline_insn_count(void);
+uint64_t* get_inline_insn_count(void) {
+  return &inline_insn_count;
+}
+
+int clock_gettime(clockid_t clk_id, struct timespec *tp) {
+    const uint64_t freq = 1000000000; // 1GHz
+
+    tp->tv_sec = inline_insn_count / freq;
+    tp->tv_nsec = inline_insn_count % freq;
+
+    return 0;
+}
 
 static inline abi_long host_to_target_timespec(abi_ulong target_addr,
                                                struct timespec *host_ts)
